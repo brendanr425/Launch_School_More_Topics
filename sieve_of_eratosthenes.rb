@@ -3,7 +3,7 @@ class Sieve
   UNMARKED = :unmarked
   PRIME = :prime
 
-  attr_reader :limit, :range_hash
+  attr_reader :limit, :range_hash, :sleep_arg
 
   def initialize(limit)
     hsh = {}
@@ -12,19 +12,10 @@ class Sieve
 
     @range_hash = hsh
     @limit = limit
-  end
-
-  def output_range_hash
-    puts "Unmarked: #{unmarked_numbers}"
-    puts
-    puts "Marked: #{marked_numbers}"
-    puts
-    puts "Primes: #{prime_numbers}"
+    @sleep_arg = 1/limit
   end
 
   def find_primes
-    sleep_arg = 1/limit if limit > 0
-
     loop do
       current_unmarked = unmarked_numbers
       num = current_unmarked.first
@@ -34,7 +25,7 @@ class Sieve
         @range_hash[num] = MARKED if current_unmarked.include?(num)
         @range_hash[num] = PRIME if num == current_unmarked.first
         output_range_hash
-        sleep(sleep_arg) if sleep_arg != nil
+        sleep(sleep_arg)
         clear
         break if @range_hash[num] == nil
         num += multiple 
@@ -57,6 +48,14 @@ class Sieve
 
   def prime_numbers
     @range_hash.select { |_, mark_status| mark_status == PRIME }.keys
+  end
+
+  def output_range_hash
+    puts "Unmarked: #{unmarked_numbers}"
+    puts
+    puts "Marked: #{marked_numbers}"
+    puts
+    puts "Primes: #{prime_numbers}"
   end
 
   def clear
