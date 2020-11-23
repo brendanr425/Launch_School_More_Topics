@@ -12,28 +12,34 @@ class Sieve
 
     @range_hash = hsh
     @limit = limit
-    @sleep_arg = 1/limit
   end
 
   def find_primes
+    idx = 0
     loop do
       current_unmarked = unmarked_numbers
-      num = current_unmarked.first
-      multiple = num
-
+      range_key = current_unmarked[idx]
+      multiple = range_key
       loop do
-        @range_hash[num] = MARKED if current_unmarked.include?(num)
-        @range_hash[num] = PRIME if num == current_unmarked.first
-        output_range_hash
-        sleep(sleep_arg)
-        clear
-        break if @range_hash[num] == nil
-        num += multiple 
-      end
+        if current_unmarked.include?(range_key) && range_key != multiple
+          @range_hash[range_key] = MARKED 
+        end
 
-      break if unmarked_numbers == []
+        if limit <= 20
+          output_range_hash(multiple)
+          sleep(0.5)
+          clear
+        end
+
+        break if @range_hash[range_key] == nil
+        range_key += multiple
+      end
+      idx += 1
+      break if unmarked_numbers.last == multiple
     end
-    prime_numbers
+    puts "Your prime numbers are: #{unmarked_numbers}"
+    puts
+    unmarked_numbers
   end
 
   private
@@ -50,12 +56,12 @@ class Sieve
     @range_hash.select { |_, mark_status| mark_status == PRIME }.keys
   end
 
-  def output_range_hash
+  def output_range_hash(multiple)
     puts "Unmarked: #{unmarked_numbers}"
     puts
     puts "Marked: #{marked_numbers}"
     puts
-    puts "Primes: #{prime_numbers}"
+    puts "Current multiple: #{multiple}"
   end
 
   def clear
